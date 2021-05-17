@@ -17,8 +17,18 @@ actor ConsoleInput is Input
 
   var current_promise: (None | Promise[String])
 
-  new create() =>
+  new create(env': Env) =>
     current_promise = None
+    let term = ANSITerm(Readline(recover ConsoleHandler(this) end, env'.out), env'.input)
+    term.prompt("Input > ")
+    let notify = object iso
+      let term: ANSITerm = term
+      fun ref apply(data: Array[U8] iso) => term(consume data)
+      fun ref dispose() => term.dispose()
+    end
+
+    env'.input(consume notify)
+
 
   be notify_on_next_key(p: Promise[String]) =>
     current_promise = p
@@ -32,7 +42,7 @@ actor ConsoleInput is Input
     | let p: Promise[String] =>
       p(line)
       current_promise = None
-    | None => None // throws the input away
+    | None => prompt("Input > ") // throws the input away
     end
 
     prompt("Input > ")

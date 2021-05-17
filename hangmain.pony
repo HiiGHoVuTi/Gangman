@@ -21,7 +21,7 @@ actor Main
     hangman_state       = HangmanState
 
     let display_factory = ConsoleDisplay(env')
-    let input_factory   = ConsoleInput
+    let input_factory   = ConsoleInput(env')
     let word_factory    = try FairWordManager(
           FilePath(env'.root as AmbientAuth, "english-words.txt")?
       )
@@ -29,16 +29,6 @@ actor Main
       env'.out.print("Error during init")
       return
     end
-
-    let term = ANSITerm(Readline(recover ConsoleHandler(input_factory) end, env'.out), env'.input)
-    term.prompt("Input > ")
-    let notify = object iso
-      let term: ANSITerm = term
-      fun ref apply(data: Array[U8] iso) => term(consume data)
-      fun ref dispose() => term.dispose()
-    end
-
-    env'.input(consume notify)
 
     let key_pressed = Promise[String]
     .> next[None](recover this~handle(
