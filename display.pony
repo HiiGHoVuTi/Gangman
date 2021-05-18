@@ -6,6 +6,7 @@ trait Display
     stage: U8)
   fun display_word(word: String)
   fun display_hangman(stage: U8)
+  fun display_wrong_guesses(guesses: Array[String]val)
 
 actor ConsoleDisplay is Display
 

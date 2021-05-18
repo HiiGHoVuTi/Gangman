@@ -3,7 +3,6 @@ use "files"
 use "promises"
 use "term"
 
-
 class HangmanState
   var guessed_letters: Array[String] = []
   var wrong_letters: Array[String] = []

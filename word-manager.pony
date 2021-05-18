@@ -2,6 +2,7 @@
 use "promises"
 use "random"
 use "files"
+use "time"
 
 trait WordManager
 
@@ -13,11 +14,12 @@ trait WordManager
 
 actor FairWordManager is WordManager
 
-  let rando: Rand = Rand
+  let rando: Rand
   var correct_word: String = ""
   var dict: Array[String] = []
 
   new create(path: FilePath) =>
+    rando = Rand(Time.nanos(), Time.millis())
     initialize(path)
 
   be initialize(path: FilePath) =>
@@ -45,7 +47,6 @@ actor FairWordManager is WordManager
 
   //TODO refactor this
   be make_masked(guesses: Array[String]val, p: Promise[String]) =>
-    // try p(guesses(0)?) end
     let out = recover
       let s = String(correct_word.size())
       for char in correct_word.values() do
