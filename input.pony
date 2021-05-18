@@ -15,12 +15,13 @@ class ConsoleHandler is ReadlineNotify
 
 actor ConsoleInput is Input
 
+  let message: String = ""
   var current_promise: (None | Promise[String])
 
   new create(env': Env) =>
     current_promise = None
     let term = ANSITerm(Readline(recover ConsoleHandler(this) end, env'.out), env'.input)
-    term.prompt("Input > ")
+    term.prompt(message)
     let notify = object iso
       let term: ANSITerm = term
       fun ref apply(data: Array[U8] iso) => term(consume data)
@@ -42,7 +43,7 @@ actor ConsoleInput is Input
     | let p: Promise[String] =>
       p(line)
       current_promise = None
-    | None => prompt("Input > ") // throws the input away
+    | None => prompt(message) // throws the input away
     end
 
-    prompt("Input > ")
+    prompt(message)

@@ -15,10 +15,12 @@ class HangmanState
     guessed_letters.push(s)
   fun ref add_wrong(s: String) =>
     wrong_letters.push(s)
-  fun get_guesses_clone(): Array[String]val =>
-    let length = guessed_letters.size()
+  fun get_guesses_clone(wrong: Bool = false): Array[String]val =>
+    let arr = if wrong then wrong_letters else guessed_letters end
+
+    let length = arr.size()
     let guessed_clone = recover Array[String](length) end
-    for guess in guessed_letters.values() do
+    for guess in arr.values() do
       guessed_clone.push(guess)
     end
     consume guessed_clone
@@ -48,6 +50,8 @@ actor Main
       ) end)
     input_factory.notify_on_next_key(key_pressed)
 
+    setup_display(word_factory, display_factory)
+
   be handle_input(display_factory: Display tag,
   input_factory: Input tag,
   word_factory: WordManager tag,
@@ -74,10 +78,23 @@ actor Main
       hangman_state.add_to_count()
     end
 
+    setup_display(word_factory, display_factory)
+
+  be setup_display(word_factory: WordManager tag,
+  display_factory: Display tag) =>
+    // capture relevant variable
+    let stage = hangman_state.hangman_count
+    let right_guesses_cloned = hangman_state.get_guesses_clone(
+      where wrong=false)
+    let wrong_guesses_cloned = hangman_state.get_guesses_clone(
+      where wrong=true)
+
     word_factory.make_masked(
-    hangman_state.get_guesses_clone(),
+    right_guesses_cloned,
     Promise[String]
     .> next[None]({
-      (masked_word: String)(display_factory) =>
-        display_factory.display_word(masked_word)
+      (masked_word: String)(display_factory, stage, wrong_guesses_cloned) =>
+        display_factory.display_all(
+          masked_word, wrong_guesses_cloned, stage
+        )
     }))
