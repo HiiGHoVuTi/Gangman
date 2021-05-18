@@ -9,6 +9,7 @@ trait WordManager
   be new_word()
   be check_word(word: String, p: Promise[Bool])
   be check_letter(word: String, p: Promise[Bool])
+  be make_masked(letters: Array[String]val, p: Promise[String])
 
 actor FairWordManager is WordManager
 
@@ -40,3 +41,9 @@ actor FairWordManager is WordManager
     else
       p(false)
     end
+
+  be make_masked(letters: Array[String]val, p: Promise[String]) =>
+    let out = recover
+      String(correct_word.size())
+    end
+    p(consume out)
