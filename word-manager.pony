@@ -35,15 +35,25 @@ actor FairWordManager is WordManager
     p(correct_word == word)
 
   be check_letter(letter: String, p: Promise[Bool]) =>
-    try
-      correct_word.find(letter)?
-      p(true)
-    else
-      p(false)
-    end
+    p(correct_word.contains(letter))
 
-  be make_masked(letters: Array[String]val, p: Promise[String]) =>
+  fun guessed(chr: String, guesses: Array[String]val): Bool =>
+    for guess in guesses.values() do
+      if chr == guess then return true end
+    end
+    false
+
+  //TODO refactor this
+  be make_masked(guesses: Array[String]val, p: Promise[String]) =>
+    // try p(guesses(0)?) end
     let out = recover
-      String(correct_word.size())
+      let s = String(correct_word.size())
+      for char in correct_word.values() do
+        let str = String.from_array([char])
+        s.append(if guessed(str, guesses)
+        then str
+        else "_" end)
+      end
+      s
     end
     p(consume out)
